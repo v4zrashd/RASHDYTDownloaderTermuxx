@@ -1,0 +1,93 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# ============================================================
+#  V4Z YT DOWNLOADER — by V4Z RASHD
+#  Download YouTube videos & audio straight from Termux
+#  Repo: https://github.com/v4zrashd/RASHDYTDownloaderTermuxx
+# ============================================================
+
+RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
+CYAN='\033[0;36m'; MAGENTA='\033[0;35m'; WHITE='\033[1;37m'
+NC='\033[0m'; BOLD='\033[1m'
+
+SAVE_DIR="$HOME/storage/downloads/V4ZTube"
+
+banner() {
+    clear
+    echo -e "${MAGENTA}${BOLD}"
+    echo '  ╔══════════════════════════════════════╗'
+    echo '  ║                                      ║'
+    echo '  ║     ⬇  V4Z YT DOWNLOADER  ⬇         ║'
+    echo '  ║                                      ║'
+    echo '  ║           by V4Z RASHD               ║'
+    echo '  ║                                      ║'
+    echo '  ╚══════════════════════════════════════╝'
+    echo -e "${NC}"
+}
+
+die() { echo -e "${RED}[!] $1${NC}"; exit 1; }
+ok()  { echo -e "${GREEN}[✓] $1${NC}"; }
+
+check_deps() {
+    command -v yt-dlp >/dev/null 2>&1 || die "yt-dlp not found. Re-run the installer."
+    command -v ffmpeg >/dev/null 2>&1 || die "ffmpeg not found. Re-run the installer."
+    mkdir -p "$SAVE_DIR" || die "Cannot create $SAVE_DIR"
+}
+
+ask_url() {
+    echo -e "${CYAN}Paste YouTube link (video / playlist):${NC}"
+    read -r URL
+    [ -z "$URL" ] && die "No link given."
+}
+
+dl_video() {
+    ask_url
+    echo -e "${YELLOW}[*] Downloading video...${NC}"
+    yt-dlp -f "bv*+ba/b" --merge-output-format mp4 --no-playlist \
+        -o "$SAVE_DIR/%(title).60s.%(ext)s" "$URL" && \
+        ok "Saved to $SAVE_DIR" || die "Download failed."
+}
+
+dl_audio() {
+    ask_url
+    echo -e "${YELLOW}[*] Downloading audio (MP3)...${NC}"
+    yt-dlp -x --audio-format mp3 --audio-quality 0 --no-playlist \
+        -o "$SAVE_DIR/%(title).60s.%(ext)s" "$URL" && \
+        ok "Saved to $SAVE_DIR" || die "Download failed."
+}
+
+dl_playlist() {
+    ask_url
+    echo -e "${YELLOW}[*] Downloading full playlist...${NC}"
+    yt-dlp -f "bv*+ba/b" --merge-output-format mp4 --yes-playlist \
+        -o "$SAVE_DIR/%(playlist).40s/%(playlist_index)02d - %(title).60s.%(ext)s" "$URL" && \
+        ok "Playlist saved to $SAVE_DIR" || die "Download failed."
+}
+
+update_ytdlp() {
+    echo -e "${YELLOW}[*] Updating yt-dlp...${NC}"
+    pip install -U yt-dlp -q && ok "yt-dlp is up to date." || die "Update failed."
+}
+
+# ---------------- main ----------------
+check_deps
+while true; do
+    banner
+    echo -e "${WHITE}${BOLD}  Save folder: ${GREEN}$SAVE_DIR${NC}\n"
+    echo -e "  ${CYAN}[1]${NC} 🎬  Download Video (MP4)"
+    echo -e "  ${CYAN}[2]${NC} 🎵  Download Audio (MP3)"
+    echo -e "  ${CYAN}[3]${NC} 📃  Download Playlist (MP4)"
+    echo -e "  ${CYAN}[4]${NC} 🔄  Update yt-dlp"
+    echo -e "  ${CYAN}[0]${NC} ❌  Exit\n"
+    echo -ne "${YELLOW}  Choose › ${NC}"
+    read -r c
+    case "$c" in
+        1) dl_video ;;
+        2) dl_audio ;;
+        3) dl_playlist ;;
+        4) update_ytdlp ;;
+        0) echo -e "${GREEN}Bye! — V4Z RASHD${NC}"; exit 0 ;;
+        *) echo -e "${RED}Invalid choice.${NC}"; sleep 1 ;;
+    esac
+    echo ""
+    echo -ne "${CYAN}Press Enter to continue...${NC}"; read -r
+done
