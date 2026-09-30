@@ -1,15 +1,18 @@
 #!/data/data/com.termux/files/usr/bin/bash
 # ============================================================
 #  V4Z YT DOWNLOADER — by V4Z RASHD
-#  Download YouTube videos & audio straight from Termux
+#  Download videos & audio from YouTube, Facebook,
+#  Instagram, TikTok & 1000+ sites — straight from Termux
 #  Repo: https://github.com/v4zrashd/RASHDYTDownloaderTermuxx
+#  Telegram: https://t.me/rashdteem
 # ============================================================
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
 CYAN='\033[0;36m'; MAGENTA='\033[0;35m'; WHITE='\033[1;37m'
-NC='\033[0m'; BOLD='\033[1m'
+BLUE='\033[0;34m'; NC='\033[0m'; BOLD='\033[1m'
 
 SAVE_DIR="$HOME/storage/downloads/V4ZTube"
+TG="https://t.me/rashdteem"
 
 banner() {
     clear
@@ -22,6 +25,7 @@ banner() {
     echo '  ║                                      ║'
     echo '  ╚══════════════════════════════════════╝'
     echo -e "${NC}"
+    echo -e "  ${BLUE}${BOLD}📢 Telegram: ${CYAN}$TG${NC}\n"
 }
 
 die() { echo -e "${RED}[!] $1${NC}"; exit 1; }
@@ -34,7 +38,7 @@ check_deps() {
 }
 
 ask_url() {
-    echo -e "${CYAN}Paste YouTube link (video / playlist):${NC}"
+    echo -e "${CYAN}Paste link (YouTube / Facebook / Instagram / TikTok / ...):${NC}"
     read -r URL
     [ -z "$URL" ] && die "No link given."
 }
@@ -64,8 +68,8 @@ dl_playlist() {
 }
 
 update_ytdlp() {
-    echo -e "${YELLOW}[*] Updating yt-dlp...${NC}"
-    pip install -U yt-dlp -q && ok "yt-dlp is up to date." || die "Update failed."
+    echo -e "${YELLOW}[*] Updating downloader engine...${NC}"
+    pip install -U yt-dlp -q && ok "Engine is up to date." || die "Update failed."
 }
 
 # ---------------- main ----------------
@@ -73,11 +77,12 @@ check_deps
 while true; do
     banner
     echo -e "${WHITE}${BOLD}  Save folder: ${GREEN}$SAVE_DIR${NC}\n"
-    echo -e "  ${CYAN}[1]${NC} 🎬  Download Video (MP4)"
-    echo -e "  ${CYAN}[2]${NC} 🎵  Download Audio (MP3)"
+    echo -e "  ${CYAN}[1]${NC} 🎬  Download Video (MP4) — any site"
+    echo -e "  ${CYAN}[2]${NC} 🎵  Download Audio (MP3) — any site"
     echo -e "  ${CYAN}[3]${NC} 📃  Download Playlist (MP4)"
-    echo -e "  ${CYAN}[4]${NC} 🔄  Update yt-dlp"
+    echo -e "  ${CYAN}[4]${NC} 🔄  Update downloader engine"
     echo -e "  ${CYAN}[0]${NC} ❌  Exit\n"
+    echo -e "  ${WHITE}Supports: YouTube • Facebook • Instagram • TikTok • 1000+ sites${NC}\n"
     echo -ne "${YELLOW}  Choose › ${NC}"
     read -r c
     case "$c" in
